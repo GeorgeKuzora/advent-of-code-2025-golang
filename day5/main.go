@@ -39,14 +39,6 @@ func CompareByLeftBorder(a, b Range) int {
 	return cmp.Compare(a.right, b.right)
 }
 
-func CompareRight(a, b Range) int {
-	rightCompare := cmp.Compare(a.right, b.right)
-	if rightCompare != 0 {
-		return rightCompare
-	}
-	return cmp.Compare(a.left, b.left)
-}
-
 func ComparItemInRange(r Range, i Item) int {
 	integer := int(i)
 	if integer <= r.right && integer >= r.left {
@@ -101,6 +93,15 @@ func main() {
 	fmt.Printf("Final count: %d\n", count)
 
 	// PART 2
+	allRangesCount := 0
+
+	for _, r := range(combinedRanges) {
+		inRange := r.right - r.left + 1
+		allRangesCount += inRange
+	}
+
+	fmt.Println()
+	fmt.Printf("All ranges count: %d\n", allRangesCount)
 }
 
 func combineRanges(ranges []Range) []Range {
