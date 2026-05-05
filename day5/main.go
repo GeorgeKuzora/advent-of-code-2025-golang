@@ -79,20 +79,59 @@ func main() {
 		ranges = append(ranges, r)
 	}
 
-	revertRange := slices.Clone(ranges)
-
 	slices.SortFunc(ranges, CompareByLeftBorder)
-	slices.SortFunc(revertRange, CompareRight)
 
+	fmt.Println("Sorted ranges")
 	for _, r := range(ranges) {
 		fmt.Println(r)
 	}
 	fmt.Println()
 
-	count := CountItemInRanges(items, ranges, revertRange)
+	combinedRanges := combineRanges(ranges)
+
+	fmt.Println()
+
+	fmt.Println("Combined ranges")
+	for _, r := range(combinedRanges) {
+		fmt.Println(r)
+	}
+	fmt.Println()
+
+	count := CountItemInRanges(items, combinedRanges)
 	fmt.Printf("Final count: %d\n", count)
 
 	// PART 2
+}
+
+func combineRanges(ranges []Range) []Range {
+	cri := 0
+	nri := cri + 1
+	var out []Range
+
+	for cri < len(ranges) {
+		cr := ranges[cri]
+		comb := Range{left: cr.left, right: cr.right}
+
+		for nri < len(ranges){
+			nr := ranges[nri]
+
+			if comb.right < nr.left {
+				break
+			} else if comb.right >= nr.left && comb.right <= nr.right {
+				comb.right = nr.right
+				cri += 1
+				nri += 1
+			} else if comb.right >= nr.left && comb.right > nr.right {
+				cri += 1
+				nri += 1
+			}
+		}
+
+		out = append(out, comb)
+		cri += 1
+		nri += 1
+	}
+	return out
 }
 
 func getInput(filename string) (Input, error) {
@@ -126,25 +165,14 @@ func getInput(filename string) (Input, error) {
 	return input, nil
 }
 
-func CountItemInRanges(items []Item, ranges []Range, revert []Range) int {
+func CountItemInRanges(items []Item, ranges []Range) int {
 	count := 0
 
 	for _, i := range(items) {
 		_, found := slices.BinarySearchFunc(ranges, i, ComparItemInRange)
-		_, foundRevert := slices.BinarySearchFunc(revert, i, ComparItemInRange)
-		if found || foundRevert {
+		if found {
 			count += 1
 		}
 	}
-
-	// for _, i := range(items) {
-	// 	for _, r := range(ranges) {
-	// 		found := ComparItemInRange(r, i)
-	// 		if found == 0 {
-	// 			count += 1
-	// 			break
-	// 		}
-	// 	}
-	// }
 	return count
 }
